@@ -79,7 +79,9 @@ fi
 
 # ---------------------------------------------------------------- files & permissions
 step "Linking uploads folder and fixing permissions"
-[ -e public/storage ] || "$PHP" artisan storage:link
+# (plain ln: Hostinger disables PHP's exec(), which artisan storage:link may need)
+mkdir -p storage/app/public
+[ -e public/storage ] || ln -s "$APP_DIR/storage/app/public" public/storage
 chmod -R u+rwX,g+rwX storage bootstrap/cache database
 
 # ---------------------------------------------------------------- point the subdomain at /public
