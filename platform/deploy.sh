@@ -84,13 +84,17 @@ chmod -R u+rwX,g+rwX storage bootstrap/cache database
 
 # ---------------------------------------------------------------- point the subdomain at /public
 step "Pointing $HOST at the app"
-SITE_ROOT="$HOME/domains/$ROOT_DOMAIN/public_html"
-if [ ! -d "$SITE_ROOT" ]; then
-  echo "Could not find $SITE_ROOT"
+if [ -e "$HOME/domains/$HOST/public_html" ]; then
+  # A website of its own (e.g. a free *.hostingersite.com temporary domain)
+  WEB="$HOME/domains/$HOST/public_html"
+elif [ -d "$HOME/domains/$ROOT_DOMAIN/public_html" ]; then
+  # A subdomain living inside its parent domain's folder
+  WEB="$HOME/domains/$ROOT_DOMAIN/public_html/$SUB"
+else
+  echo "Could not find a website folder for $HOST."
   echo "Folders that exist:"; ls "$HOME/domains" 2>/dev/null || true
-  echo "Check the domain name, or create the subdomain in hPanel > Domains > Subdomains first."; exit 1
+  echo "Copy the site name exactly as listed above and run this again."; exit 1
 fi
-WEB="$SITE_ROOT/$SUB"
 if [ -d "$WEB" ] && [ ! -L "$WEB" ]; then
   mv "$WEB" "$WEB.old-$(date +%Y%m%d%H%M%S)"
 fi
